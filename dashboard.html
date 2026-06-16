@@ -1,0 +1,182 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- Manifest koppelen -->
+  <link rel="manifest" href="/manifest.json">
+  <!-- Themakleur (ook voor iOS Safari) -->
+  <meta name="theme-color" content="#00695C">
+</head>
+<body>
+  <header>
+    <nav>
+    <a href="index.html">
+      Home
+    </a>
+    <a href="dashboard.html">
+      Dashboard
+    </a>
+    <a href="info.html">
+      Info
+    </a>
+  </nav>
+  </header>
+
+<h2>
+Dashboard
+</h2>
+<!--datum filter-->
+<div id="filter-balk">
+  <button data-periode="alles">Alles</button>
+  <button data-periode="dag">Vandaag</button>
+  <button data-periode="week">Week</button>
+  <button data-periode="maand">Maand</button>
+</div>
+
+<!--Formulier-->
+<form id="voeding-formulier">
+  <input id="voeding-datum" type="date" required>
+  <input id="voeding-titel" type="text" placeholder="Wat heb jij gegeten?" required>
+  <input id="voeding-kcal" type="text" placeholder="Aantal kcal" required>
+  <input id="voeding-vet" type="text" placeholder="Aantal vetten" required>
+  <input id="voeding-suiker" type="text" placeholder="Aantal suikers" required>
+  <input id="voeding-zout" type="text" placeholder="Aantal zout" required>
+  <button type="submit">Toevoegen</button>
+</form>
+
+<ul id="voeding-lijst"></ul>
+
+<script>
+
+//selecteer formulier
+const formulier = document.querySelector('#voeding-formulier');
+
+//aanmaken van een item
+function getVoeding() {
+  const data = localStorage.getItem('voeding');
+  return data ? JSON.parse(data) : [];
+}
+//opslaan van een item
+function saveVoeding(voeding) {
+  localStorage.setItem('voeding', JSON.stringify(voeding));
+}
+
+//delete items
+function deleteVoeding(id) {
+  const gefilterd = getVoeding().filter(t => t.id !== id);
+  saveVoeding(gefilterd);
+  toonItems();
+}
+
+//selecteer datum
+let activePeriode = 'alles';
+
+console.log (activePeriode);
+
+document.querySelector('#filter-balk').addEventListener('click', function(event) {
+  if (!event.target.dataset.periode) return;
+  activePeriode = event.target.dataset.periode;
+  toonItems(activePeriode);
+});
+
+//items laten zien in een lijst
+function toonItems(periode = 'alles') {
+  const alle = getVoeding();
+  const gefilterd = filterOpPeriode(alle, periode);
+  const voeding = getVoeding();
+  const lijst = document.querySelector('#voeding-lijst');
+
+  console.log (gefilterd);
+
+  //als er nog geen items zijn toegevoegd
+  if (voeding.length === 0) {
+    lijst.innerHTML = '<li>Nog geen items toegevoegd.</li>';
+    return;
+  }
+  lijst.innerHTML = voeding
+    .map(v => `<li data-id="${v.id}">${v.titel} <small>${v.datum}</small><small>${v.kcal}</small><small>${v.vet}</small><small>${v.suiker}</small><small>${v.zout}</small></li>`)
+    .join('');
+
+    //delete knop aanmaken
+  lijst.innerHTML = voeding.map(v => `
+    <li data-id="${v.id}">
+      <span>${v.titel}</span>
+      <button class="verwijder-knop" data-id="${v.id}">Verwijderen</button>
+    </li>
+  `).join('');
+
+}
+
+//filteren op datum
+function filterOpPeriode(voeding, periode) {
+  const nu = new Date();
+
+  console.log (periode);
+  
+  return voeding.filter(voeding => {
+    const d = new Date(voeding.datum);
+
+    if (periode === 'dag') {
+      // Zelfde dag, maand én jaar
+      return d.getDate() === nu.getDate()
+           && d.getMonth() === nu.getMonth()
+           && d.getFullYear() === nu.getFullYear();
+    }
+
+    if (periode === 'week') {
+      // Binnen de afgelopen 7 dagen
+      const zevenDagenTerug = new Date();
+      zevenDagenTerug.setDate(nu.getDate() - 7);
+      return d >= zevenDagenTerug && d <= nu;
+    }
+
+    if (periode === 'maand') {
+      // Zelfde maand én jaar
+      return d.getMonth() === nu.getMonth()
+           && d.getFullYear() === nu.getFullYear();
+    }
+
+    return true; // 'alles' — geen filter
+  });
+}
+
+//data ophalen van de formulier
+formulier.addEventListener('submit', function(event) {
+  event.preventDefault();
+  const voeding = getVoeding();
+  voeding.push({
+    id: Date.now(),
+    titel: document.querySelector('#voeding-titel').value.trim(),
+    datum: document.querySelector('#voeding-datum').value,
+    kcal: document.querySelector('#voeding-kcal').value,
+    vet: document.querySelector('#voeding-vet').value,
+    suiker: document.querySelector('#voeding-suiker').value,
+    zout: document.querySelector('#voeding-zout').value
+  });
+  saveVoeding(voeding);
+  toonItems();
+  formulier.reset();
+});
+
+//delete code
+const lijst = document.querySelector('#voeding-lijst');
+
+lijst.addEventListener('click', function(event) {
+  // Controleer of er op een verwijderknop geklikt is
+  if (!event.target.classList.contains('verwijder-knop')) return;
+
+  // Lees het id uit het data-id attribuut
+  const verwijderId = Number(event.target.dataset.id);
+
+  // Filter het item eruit
+  const genomen = getVoeding().filter(t => t.id !== verwijderId);
+  saveVoeding(genomen);
+  toonItems(); // ververs de lijst
+});
+// Voert de functie toonItems uit.
+toonItems();
+
+</script>
+</body>
+</html>
