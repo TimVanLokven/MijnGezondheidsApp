@@ -69,7 +69,6 @@ function deleteVoeding(id) {
   saveVoeding(gefilterd);
   toonItems();
 }
-
 //selecteer datum
 let activePeriode = 'alles';
 
@@ -84,11 +83,10 @@ document.querySelector('#filter-balk').addEventListener('click', function(event)
 //items laten zien in een lijst
 function toonItems(periode = 'alles') {
   const alle = getVoeding();
-  const gefilterd = filterOpPeriode(alle, periode);
-  const voeding = getVoeding();
+  const voeding = filterOpPeriode(alle, periode);
   const lijst = document.querySelector('#voeding-lijst');
 
-  console.log (gefilterd);
+  console.log (voeding);
 
   //als er nog geen items zijn toegevoegd
   if (voeding.length === 0) {
@@ -102,7 +100,12 @@ function toonItems(periode = 'alles') {
     //delete knop aanmaken
   lijst.innerHTML = voeding.map(v => `
     <li data-id="${v.id}">
+      <span>${v.datum}</span>
       <span>${v.titel}</span>
+      <span>${v.kcal} kcal</span>
+      <span>${v.vet} gram vet</span>
+      <span>${v.suiker} gram suiker</span>
+      <span>${v.zout} gram zout</span>
       <button class="verwijder-knop" data-id="${v.id}">Verwijderen</button>
     </li>
   `).join('');
@@ -113,7 +116,13 @@ function toonItems(periode = 'alles') {
 function filterOpPeriode(voeding, periode) {
   const nu = new Date();
 
+  const vandaagString = nu.toISOString().slice(0, 10);
+
+  // Controleer of een item van vandaag is:
+  const isVandaag = voeding.datum === vandaagString;
+
   console.log (periode);
+  console.log (nu);
   
   return voeding.filter(voeding => {
     const d = new Date(voeding.datum);
@@ -175,7 +184,7 @@ lijst.addEventListener('click', function(event) {
   saveVoeding(genomen);
   toonItems(); // ververs de lijst
 });
-// Voert de functie toonItems uit.
+// Uitvoeren functies bij het laden van de pagina
 toonItems();
 </script>
 </body>
