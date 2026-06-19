@@ -1,13 +1,14 @@
-const CACHE_NAAM = 'gezondheid-app-v0.5';
+const CACHE_NAAM = 'gezondheid-app-v0.6';
 
 const TE_CACHEN_BESTANDEN = [
   '/',
   '/index.html',
+  '/dashboard.html',
+  '/info.html',
   '/css/style.css',
-  '/js/app.js',
   '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/icons/icon192.png',
+  '/icons/icon512.png'
 ];
 
 // opent de cache en slaat bestanden op
