@@ -2,7 +2,7 @@
   "name": "Calorieën Tracker",
   "short_name": "CalorieënTrack",
   "description": "Houd bij hoeveel kcal, vetten, suikers en zout jij consumeert",
-  "start_url": "/index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "theme_color": "#00695C",
   "background_color": "#ffffff",
