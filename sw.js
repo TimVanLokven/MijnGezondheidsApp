@@ -11,6 +11,21 @@ const TE_CACHEN_BESTANDEN = [
   '/icons/icon512.png'
 ];
 
+//bestanden opslaan in de cach
+self.addEventListener('install', function(event) {
+  console.log('SW: installeren');
+});
+
+//oude cache verwijderen
+self.addEventListener('activate', function(event) {
+  console.log('SW: actief');
+});
+
+//Elk verzoek van het netwerk onderscheppen
+self.addEventListener('fetch', function(event) {
+  console.log('SW: verzoek voor', event.request.url);
+});
+
 // opent de cache en slaat bestanden op
 self.addEventListener('install', function(event) {
   console.log('SW: installeren...');
